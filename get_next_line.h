@@ -6,7 +6,7 @@
 /*   By: rfinneru <rfinneru@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/23 10:50:37 by rfinneru      #+#    #+#                 */
-/*   Updated: 2023/11/10 16:48:27 by rfinneru      ########   odam.nl         */
+/*   Updated: 2023/11/13 18:14:34 by rfinneru      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 # include <unistd.h>
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 1
+#  define BUFFER_SIZE 5
 # endif
 
 // get_next_line
@@ -33,6 +33,7 @@ int		ft_strlen(char *str);
 char	*ft_strncpy(char *dest, char *src, unsigned int n);
 char	*ft_strjoin(char *s1, char *s2);
 char	*ft_strchr(const char *s, int c);
-void	*ft_free(char **line);
+void	*ft_free(char **line, char **buffer, int arg);
+char	*ft_strdup(const char *s);
 
 #endif

@@ -6,34 +6,32 @@
 /*   By: rfinneru <rfinneru@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/23 10:50:40 by rfinneru      #+#    #+#                 */
-/*   Updated: 2023/11/10 17:01:42 by rfinneru      ########   odam.nl         */
+/*   Updated: 2023/11/16 16:03:26 by rfinneru      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*trim_line_right(char *line)
+char	*trim_line_right(char *line, char **new_line)
 {
 	int		i;
 	int		j;
 	char	*str;
-	char	nl;
 
-	nl = '\n';
 	i = 0;
-	while (line[i] && line[i] != nl)
+	while (line[i] && line[i] != '\n')
 		i++;
 	if (line[i] == '\0')
-		return (ft_free(&line));
+		return (ft_free(&line, NULL, 1));
 	str = (char *)malloc(sizeof(char) * (ft_strlen(line) - i + 1));
 	if (!str)
-		return (ft_free(&line));
+		return (ft_free(&line, new_line, 2));
 	i++;
 	j = 0;
 	while (line[i])
 		str[j++] = line[i++];
 	str[j] = '\0';
-	ft_free(&line);
+	ft_free(&line, NULL, 1);
 	return (str);
 }
 
@@ -87,19 +85,15 @@ char	*read_buffer(int fd, char *line)
 	{
 		buffer = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char));
 		if (!buffer)
-			return (ft_free(&line));
+			return (ft_free(&line, NULL, 1));
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
 		if (bytes_read == -1)
-		{
-			ft_free(&buffer);
-			return (ft_free(&line));
-		}
+			return (ft_free(&line, &buffer, 2));
 		buffer[bytes_read] = '\0';
-		if (!line && buffer)
-			line = ft_strdup(buffer);
-		else if (line && buffer)
-			line = ft_strjoin(line, buffer);
-		ft_free(&buffer);
+		line = ft_strjoin(line, buffer);
+		if (!line)
+			return (ft_free(&buffer, NULL, 1));
+		ft_free(&buffer, NULL, 1);
 	}
 	return (line);
 }
@@ -110,16 +104,14 @@ char	*get_next_line(int fd)
 	char		*new_line;
 
 	if (BUFFER_SIZE == 0 || fd < 0 || fd > _SC_OPEN_MAX + 1)
-	{
 		return (NULL);
-	}
 	line = read_buffer(fd, line);
 	if (!line)
 		return (NULL);
 	new_line = trim_line_left(line);
-	line = trim_line_right(line);
+	line = trim_line_right(line, &new_line);
 	if (!new_line)
-		ft_free(&line);
+		ft_free(&line, NULL, 1);
 	return (new_line);
 }
 
@@ -128,7 +120,9 @@ char	*get_next_line(int fd)
 // 	int		fd1;
 // 	char	*out;
 
-// 	fd1 = open("file_descriptor.txt", O_RDONLY);
+// 	// fd1 = 42;
+// 	// fd1 = 0;
+// 	fd1 = open("get_next_line.c", O_RDONLY);
 // 	if (fd1 == -1)
 // 	{
 // 		printf("error opening file descriptor\n");
@@ -136,8 +130,9 @@ char	*get_next_line(int fd)
 // 	out = get_next_line(fd1);
 // 	while (out)
 // 	{
-// 		printf("%s$", out);
+// 		printf("%s", out);
 // 		free(out);
 // 		out = get_next_line(fd1);
 // 	}
+// 	free(out);
 // }
